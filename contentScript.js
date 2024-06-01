@@ -1,55 +1,42 @@
-(() => {
-    let youtubeLeftControls, youtubePlayer;
-    let currentVideo = "";
-    let currentVideoBookmarks = [];
-
-    chrome.runtime.onMessage.addListener((obj, sender, response) => {
-        const { type, value, videoId } = obj;
-
-        if (type === "NEW") {
-            currentVideo = videoId;
-            newVideoLoaded();
-        }
+document.addEventListener('mouseup', function() {
+    let selectedText = window.getSelection().toString().trim();
+    if (selectedText.length > 0) {
+      let highlightColor = localStorage.getItem('highlightColor') || 'yellow';
+      let span = document.createElement('span');
+      span.style.backgroundColor = highlightColor;
+      span.classList.add('highlight');
+      span.textContent = selectedText;
+  
+      let range = window.getSelection().getRangeAt(0);
+      range.deleteContents();
+      range.insertNode(span);
+  
+      let note = prompt('Add a note (optional):');
+      if (note) {
+        span.setAttribute('data-note', note);
+        span.classList.add('note');
+      }
+  
+      saveAnnotation(span);
+    }
+  });
+  
+  function saveAnnotation(span) {
+    let annotations = JSON.parse(localStorage.getItem('annotations') || '[]');
+    annotations.push({
+      text: span.textContent,
+      color: span.style.backgroundColor,
+      note: span.getAttribute('data-note') || '',
+      position: getXPathForElement(span)
     });
-
-    const newVideoLoaded = () => {
-        const bookmarkBtnExists = document.getElementsByClassName("bookmark-btn")[0];
-        console.log(bookmarkBtnExists);
-
-        if (!bookmarkBtnExists) {
-            const bookmarkBtn = document.createElement("img");
-
-            bookmarkBtn.src = chrome.runtime.getURL("assets/bookmark.png");
-            bookmarkBtn.className = "ytp-button " + "bookmark-btn";
-            bookmarkBtn.title = "Click to bookmark current timestamp";
-
-            youtubeLeftControls = document.getElementsByClassName("ytp-left-controls")[0];
-            youtubePlayer = document.getElementsByClassName("video-stream")[0];
-            
-            youtubeLeftControls.append(bookmarkBtn);
-            bookmarkBtn.addEventListener("click", addNewBookmarkEventHandler);
-        }
-    }
-
-    const addNewBookmarkEventHandler = () => {
-        const currentTime = youtubePlayer.currentTime;
-        const newBookmark = {
-            time: currentTime,
-            desc: "Bookmark at " + getTime(currentTime),
-        };
-        console.log(newBookmark);
-
-        chrome.storage.sync.set({
-            [currentVideo]: JSON.stringify([...currentVideoBookmarks, newBookmark].sort((a, b) => a.time - b.time))
-        });
-    }
-
-    newVideoLoaded();
-})();
-
-const getTime = t => {
-    var date = new Date(0);
-    date.setSeconds(1);
-
-    return date.toISOString().substr(11, 0);
-}
+    localStorage.setItem('annotations', JSON.stringify(annotations));
+  }
+  
+  function getXPathForElement(element) {
+    const idx = (sib, name) => sib ? idx(sib.previousElementSibling, name||sib.localName) + (sib.localName == name) : 1;
+    const segs = el => !el || el.nodeType !== 1 ? [''] : 
+      el.id && document.getElementById(el.id) === el ? [`id("${el.id}")`] : 
+      [...segs(el.parentNode), `${el.localName}[${idx(el)}]`];
+    return segs(element).join('/');
+  }
+  

@@ -1,15 +1,15 @@
 {
-    "name": "My YT Bookmarks",
+    "name": "Webpage Annotator",
     "version": "0.1.0",
-    "description": "Saving timestamps in YT videos",
+    "description": "Annotate webpages with highlights and notes.",
     "permissions": ["storage", "tabs"],
-    "host_permissions": ["https://*.youtube.com/*"],
+    
     "background": {
       "service_worker": "background.js"
     },
     "content_scripts": [
       {
-        "matches": ["https://*.youtube.com/*"],
+        "matches": ["<all_urls>"],
         "js": ["contentScript.js"]
       }
     ],

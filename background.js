@@ -1,12 +1,13 @@
-chrome.tabs.onUpdated.addListener((tabId, tab) => {
-    if (tab.url && tab.url.includes("youtube.com/watch")) {
-      const queryParameters = tab.url.split("?")[1];
-      const urlParameters = new URLSearchParams(queryParameters);
-  
-      chrome.tabs.sendMessage(tabId, {
-        type: "NEW",
-        videoId: urlParameters.get("v"),
-      });
-    }
-  });
-  
+chrome.runtime.onInstalled.addListener(() => {
+  chrome.storage.sync.set({ annotations: [] });
+});
+
+chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+  if (request.action === 'saveAnnotation') {
+    chrome.storage.sync.get('annotations', (data) => {
+      let annotations = data.annotations || [];
+      annotations.push(request.annotation);
+      chrome.storage.sync.set({ annotations });
+    });
+  }
+});

@@ -1,10 +1,24 @@
-<link href="popup.css" rel="stylesheet" type="text/css" />
-<script type="module" src="popup.js"></script>
-
-<div class="container">
-  <div>
-    <div class="title">Your bookmarks for this video</div>
-
-    <div class="bookmarks" id="bookmarks"></div>
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Webpage Annotator</title>
+  <style>
+    body {
+      width: 300px;
+      font-family: Arial, sans-serif;
+    }
+    .color-picker {
+      margin-bottom: 10px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Annotator Settings</h1>
+  <div class="color-picker">
+    <label for="highlightColor">Highlight Color:</label>
+    <input type="color" id="highlightColor">
   </div>
-</div>
+  <button id="exportAnnotations">Export Annotations</button>
+  <script src="popup.js"></script>
+</body>
+</html>
