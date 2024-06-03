@@ -107,3 +107,19 @@
 // }
 
 // window.customElements.define("medium-highlighter", MediumHighlighter);
+
+
+// document.addEventListener('DOMContentLoaded', function() {
+//   var colors = ['yellow', 'cyan', 'magenta', 'orange'];
+//   colors.forEach(function(color) {
+//     var button = document.createElement('button');
+//     button.className = 'colorBtn';
+//     button.style.backgroundColor = color;
+//     button.onclick = function() {
+//       chrome.tabs.query({ active: true, currentWindow: true }, function(tabs) {
+//         chrome.tabs.sendMessage(tabs[0].id, { action: 'highlight', color: color });
+//       });
+//     };
+//     document.getElementById('annotationMenu').appendChild(button);
+//   });
+// });

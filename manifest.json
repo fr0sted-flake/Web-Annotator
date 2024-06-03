@@ -1,26 +1,29 @@
 {
   "name": "Webpage Annotator",
   "version": "0.1.0",
-  "description": "Annotate webpages with highlights and notes.",
-  "permissions": ["activeTab"],
-
+  "manifest_version": 3,
+  "description": "Automatically highlight selected text in yellow.",
+  "permissions": ["activeTab", "scripting"],
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["contentScript.js"]
+    }
+  ],
   "background": {
     "service_worker": "background.js"
   },
-
   "action": {
     "default_icon": {
       "16": "assets/ext-icon.png",
       "48": "assets/ext-icon.png",
       "128": "assets/ext-icon.png"
     },
-    "default_title": "My annotated pages",
-    "default_popup": "popup.html"
+    "default_title": "Web Annotator"
   },
   "icons": {
     "16": "assets/ext-icon.png",
     "48": "assets/ext-icon.png",
     "128": "assets/ext-icon.png"
-  },
-  "manifest_version": 3
+  }
 }

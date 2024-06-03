@@ -1,4 +1,4 @@
-.highlight {
+/* .highlight {
   background-color: yellow;
   cursor: pointer;
 }
@@ -8,4 +8,39 @@
   font-size: 0.8em;
   color: gray;
   cursor: pointer;
+} */
+
+
+/* body {
+  width: 120px;
+  padding: 5px;
 }
+
+#annotationMenu {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.colorBtn {
+  width: 30px;
+  height: 30px;
+  border: none;
+  margin: 5px;
+  cursor: pointer;
+}
+
+#yellowBtn {
+  background-color: yellow;
+}
+
+#cyanBtn {
+  background-color: cyan;
+}
+
+#magentaBtn {
+  background-color: magenta;
+}
+
+#orangeBtn {
+  background-color: orange;
+} */
