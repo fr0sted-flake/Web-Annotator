@@ -2,7 +2,7 @@
   "name": "HyperNote",
   "version": "0.1.0",
   "manifest_version": 3,
-  "description": "Annotate webpages in one click.",
+  "description": "Annotate webpages faster than ever.",
   "permissions": ["activeTab", "scripting", "storage", "commands"],
   "content_scripts": [
     {

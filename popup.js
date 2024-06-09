@@ -207,7 +207,7 @@ function showAnnotations(groupedItems) {
   sortedDates.forEach((date) => {
     const header = document.createElement("li");
     header.textContent = date;
-    header.style.fontWeight = "bold";
+    header.style.fontWeight = "normal";
     header.style.color = "#6574cd";
     list.appendChild(header);
 
@@ -229,7 +229,7 @@ function showAnnotations(groupedItems) {
           })`;
         }
         const deleteButton = document.createElement("img");
-        deleteButton.src = "../delete-icon.png";
+        deleteButton.src = "assets/delete-icon.png";
         deleteButton.alt = "Delete";
         deleteButton.style.width = "8px";
         deleteButton.style.height = "8px";
@@ -242,7 +242,8 @@ function showAnnotations(groupedItems) {
         list.appendChild(listItem);
       });
       const moreListItem = document.createElement("li");
-      moreListItem.textContent = "...more";
+      moreListItem.textContent = "Show more";
+      moreListItem.style.cursor = 'pointer';
       moreListItem.classList.add("more-item");
       moreListItem.addEventListener("click", () => {
         showEveryAnnotations(items);
@@ -394,6 +395,8 @@ function removeAnnotation(toBeDeleted) {
   });
 }
 
+
+
 function exportUserAnnotations() {
   if (typeof window.jspdf === "undefined") {
     console.error("jsPDF is not loaded.");
@@ -459,7 +462,7 @@ function exportUserAnnotations() {
       yOffset += 10;
 
       notes.forEach((note) => {
-        doc.setFontSize(10);
+        doc.setFontSize(12);
         doc.setTextColor(note.color);
 
         let lines = doc.splitTextToSize(
@@ -495,6 +498,92 @@ function exportUserAnnotations() {
     doc.save("user_annotations.pdf");
   });
 }
+
+// function exportUserAnnotations() {
+
+//   if (typeof window.jspdf === 'undefined') {
+//       console.error('jsPDF is not loaded.');
+//       return;
+//   }
+
+//   const { jsPDF } = window.jspdf;
+
+//   chrome.storage.sync.get({ annotations: [] }, (data) => {
+//       const annotations = data.annotations;
+
+//       const highlights = annotations.filter(annotation => annotation.type === 'highlight');
+//       const notes = annotations.filter(annotation => annotation.type === 'note');
+
+//       const doc = new jsPDF();
+//       let yOffset = 20; 
+//       const pageWidth = doc.internal.pageSize.getWidth();
+//       const margin = 10;
+
+//       function addSectionHeader(text, y) {
+//           doc.setFontSize(18);
+//           doc.setFont('helvetica', 'bold');
+//           doc.text(text, margin, y);
+//           doc.setFont('helvetica', 'normal');
+//           doc.setFontSize(12);
+//       }
+
+//       function addAnnotationDetails(annotation, y) {
+//           doc.setTextColor(annotation.color);
+
+//           let lines = doc.splitTextToSize(annotation.type === 'highlight' ? `Highlight: ${annotation.text}` : `Note: ${annotation.text}`, pageWidth - margin * 2);
+//           doc.text(lines, margin, y);
+//           y += lines.length * 6;
+
+//           doc.setTextColor(0, 0, 0);
+//           lines = doc.splitTextToSize(`Source Text: ${annotation.select}`, pageWidth - margin * 2);
+//           doc.text(lines, margin, y);
+//           y += lines.length * 6;
+
+//           lines = doc.splitTextToSize(`URL: ${annotation.url}`, pageWidth - margin * 2);
+//           doc.text(lines, margin, y);
+//           y += lines.length * 6;
+
+//           const date = new Date(annotation.timestamp).toLocaleString();
+//           lines = doc.splitTextToSize(`Date: ${date}`, pageWidth - margin * 2);
+//           doc.text(lines, margin, y);
+//           y += lines.length * 10;
+
+//           return y;
+//       }
+
+//       // Title Page
+//       doc.setFontSize(22);
+//       doc.text('Annotations Report', pageWidth / 2, 15, { align: 'center' });
+//       doc.setFontSize(14);
+//       doc.text(`Generated on: ${new Date().toLocaleDateString()}`, pageWidth / 2, 25, { align: 'center' });
+
+//       // Highlights Section
+//       if (highlights.length > 0) {
+//           yOffset = 40; 
+//           addSectionHeader('Highlights', yOffset);
+//           yOffset += 10;
+
+//           highlights.forEach(highlight => {
+//               yOffset = addAnnotationDetails(highlight, yOffset);
+//               yOffset += 10; // Add extra space between entries
+//           });
+//       }
+
+//       // Notes Section
+//       if (notes.length > 0) {
+//           yOffset += 20; 
+//           addSectionHeader('Notes', yOffset);
+//           yOffset += 10;
+
+//           notes.forEach(note => {
+//               yOffset = addAnnotationDetails(note, yOffset);
+//               yOffset += 10; // Add extra space between entries
+//           });
+//       }
+
+//       doc.save('user_annotations.pdf');
+//   });
+// }
 
 // function exportAnnotations() {
 //     chrome.storage.sync.get({ annotations: [] }, (data) => {
