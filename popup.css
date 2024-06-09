@@ -1,66 +1,68 @@
-@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400..700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap');
 
 * {
-    font-family: "Roboto", sans-serif;
-    font-size: 16px;
+    font-family: "Poppins", sans-serif;
+    font-size: 14px;
 }
 
 body::-webkit-scrollbar {
-    width: 6px; 
+    width: 8px; 
 }
 
 body::-webkit-scrollbar-track {
-    background: #1a1a1a; 
+    background: #535353; 
 }
 
 body::-webkit-scrollbar-thumb {
-    background: #888; 
-    border-radius: 8px; 
+    background: #717171; 
+    border-radius: 10px; 
 }
 
 body::-webkit-scrollbar-thumb:hover {
-    background: #666; 
+    background: #454545; 
 }
 
 body {
-    padding: 8px;
-    width: 260px;
-    color: #e0e0e0;
-    background-color: #1a1a1a;
+    padding: 12px;
+    width: 300px;
+    color: #f1f1f1;
+    background-color: #2a2a2a;
     display: flex;
     flex-direction: column;
     align-items: center;
 }
 
 h1 {
-    font-size: 18px;
-    margin-bottom: 8px;
-    color: #ff9999;
+    font-size: 22px;
+    margin-bottom: 12px;
+    color: #debebe;
 }
 
 .section {
-    margin-bottom: 12px;
+    margin-bottom: 16px;
 }
 
 .label-highlight {
-    margin-right: 12px;
-    font-size: 14px;
-    color: #b3b3b3;
+    margin-right: 16px;
+    font-size: 16px;
+    color: #d1d1d1;
 }
 
 input {
-    background-color: #292929;
-    color: #e0e0e0;
+    background-color: #3a3a3a;
+    color: #f1f1f1;
     border: none;
-    padding: 6px;
+    padding: 8px;
+    border-radius: 6px;
 }
 
 button {
-    margin-right: 4px;
-    padding: 6px 12px;
-    background-color: #333;
+    margin-right: 40px; /* Increased from 6px */
+    padding: 8px 16px;
+    background-color: #444;
     color: #fff;
     border: none;
+    border-radius: 6px;
 }
 
 button:hover {
@@ -70,11 +72,11 @@ button:hover {
 
 .buttons {
     display: flex;
-    gap: 8px;
+    gap: 10px;
 }
 
 #btnHighlight {
-    margin-right: 4px;
+    margin-right: 40px; /* Increased from 6px */
 }
 
 .annotation-list {
@@ -83,14 +85,15 @@ button:hover {
 }
 
 .annotation-list-item {
-    margin-bottom: 12px;
+    margin-bottom: 16px;
 }
 
 .search-box {
-    color: #e0e0e0;
-    background-color: #292929;
+    color: #f1f1f1;
+    background-color: #3a3a3a;
     border: none;
-    padding: 6px;
+    padding: 8px;
+    border-radius: 6px;
 }
 
 .annotation-header {
@@ -100,22 +103,23 @@ button:hover {
 }
 
 .annotation-header img {
-    width: 18px;
-    height: 18px;
+    width: 20px;
+    height: 20px;
     object-fit: cover;
     cursor: pointer;
 }
 
 #btnSearch {
-    padding: 3px 6px;
-    border-radius: 4px;
-    background-color: #333;
+    padding: 4px 8px;
+    border-radius: 6px;
+    background-color: #444;
     color: #fff;
     border: none;
+    margin-top: 10px;
 }
 
 #btnSearch:hover {
-    background-color: #666;
+    background-color: #777;
 }
 
 .more-item {
@@ -126,21 +130,21 @@ button:hover {
     text-decoration: underline;
 }
 
-@media (max-width: 260px) {
+@media (max-width: 300px) {
     body {
-        padding: 4px;
+        padding: 6px;
     }
 
     h1 {
-        font-size: 16px;
+        font-size: 18px;
     }
 
     button {
-        font-size: 14px;
-        padding: 5px 10px;
+        font-size: 12px;
+        padding: 6px 12px;
     }
 
     input[type="color"] {
-        height: 28px;
+        height: 30px;
     }
 }
