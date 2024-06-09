@@ -1,104 +1,158 @@
 document.addEventListener('DOMContentLoaded', () => {
-    // Load the stored highlight color or set a default color
+    loadHighlightColor();
+    addHighlightColorChangeListener();
+    addButtonEventListeners();
+    displayStoredAnnotations();
+    addSearchButtonEventListener();
+});
+
+function loadHighlightColor() {
     chrome.storage.sync.get('highlightColor', (data) => {
-        const color = data.highlightColor || '#03daf6';
+        const color = data.highlightColor || '#03daf6'; // Default color
         document.getElementById('highlightColor').value = color;
     });
+}
 
-    // Update the highlight color when changed
+function addHighlightColorChangeListener() {
     document.getElementById('highlightColor').addEventListener('change', (event) => {
         chrome.storage.sync.set({ highlightColor: event.target.value });
     });
+}
 
-    // Highlight selected text with the chosen color
+function addButtonEventListeners() {
     document.getElementById('highlightBtn').addEventListener('click', () => {
-        chrome.storage.sync.get('highlightColor', (data) => {
-            const color = data.highlightColor || '#03daf6';
-            chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-                chrome.tabs.sendMessage(tabs[0].id, { action: 'highlight', color });
-            });
-        });
+        sendMessageToCurrentTab('highlight');
     });
 
-    // Add a note to the selected text with the chosen color
     document.getElementById('noteBtn').addEventListener('click', () => {
-        chrome.storage.sync.get('highlightColor', (data) => {
-            const color = data.highlightColor || '#03daf6';
-            chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-                chrome.tabs.sendMessage(tabs[0].id, { action: 'addNote', color });
-            });
+        sendMessageToCurrentTab('addNote');
+    });
+}
+
+function sendMessageToCurrentTab(action) {
+    chrome.storage.sync.get('highlightColor', (data) => {
+        const color = data.highlightColor || '#03daf6'; // Default color
+        chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+            chrome.tabs.sendMessage(tabs[0].id, { action: action, color: color });
         });
     });
+}
 
-    // Load and display annotations
+function displayStoredAnnotations() {
     chrome.storage.sync.get({ annotations: [] }, (data) => {
         const annotations = data.annotations;
         const groupedAnnotations = groupAnnotationsByDate(annotations);
         displayAnnotations(groupedAnnotations);
     });
+}
 
-    function groupAnnotationsByDate(annotations) {
-        const grouped = {};
-
-        annotations.forEach(annotation => {
-            const date = new Date(annotation.timestamp).toLocaleDateString();
-            if (!grouped[date]) {
-                grouped[date] = [];
-            }
-            grouped[date].push(annotation);
-        });
-
-        for (const date in grouped) {
-            grouped[date].sort((a, b) => b.timestamp - a.timestamp);
+function groupAnnotationsByDate(annotations) {
+    const grouped = {};
+    annotations.forEach(annotation => {
+        const date = new Date(annotation.timestamp).toLocaleDateString();
+        if (!grouped[date]) {
+            grouped[date] = [];
         }
+        grouped[date].push(annotation);
+    });
 
-        return grouped;
+    for (const date in grouped) {
+        grouped[date].sort((a, b) => b.timestamp - a.timestamp);
     }
 
-    function displayAnnotations(groupedAnnotations) {
-        const annotationList = document.getElementById('annotationList');
-        annotationList.innerHTML = '';
+    return grouped;
+}
 
-        // Sort dates in descending order
-        const dates = Object.keys(groupedAnnotations).sort((a, b) => new Date(b) - new Date(a));
+function displayAnnotations(groupedAnnotations) {
+    const annotationList = document.getElementById('annotationList');
+    annotationList.innerHTML = ''; 
 
-        dates.forEach(date => {
-            const dateHeader = document.createElement('li');
-            dateHeader.textContent = date;
-            dateHeader.style.fontWeight = 'bold';
-            dateHeader.style.color = '#CBCED8';
-            annotationList.appendChild(dateHeader);
+    const dates = Object.keys(groupedAnnotations).sort((a, b) => new Date(b) - new Date(a));
 
-            const annotations = groupedAnnotations[date];
-            const reversedAnnotations = annotations.slice().reverse();
+    dates.forEach(date => {
+        const dateHeader = document.createElement('li');
+        dateHeader.textContent = date;
+        dateHeader.style.fontWeight = 'bold';
+        dateHeader.style.color = '#CBCED8';
+        annotationList.appendChild(dateHeader);
 
-            if (reversedAnnotations.length > 3) {
-                const recentAnnotations = reversedAnnotations.slice(-3).reverse();
-                recentAnnotations.forEach(annotation => {
-                    createAnnotationListItem(annotation, annotationList);
+        const annotations = groupedAnnotations[date];
+        const rannotations = annotations.slice().reverse();
+
+        if (rannotations.length > 3) {
+            const recentAnnotations = rannotations.slice(-3).reverse();
+            recentAnnotations.forEach(annotation => {
+                const li = document.createElement('li');
+                li.style.color = annotation.color;
+                if (annotation.type == 'note') {
+                    li.textContent = `${annotation.select} : ${annotation.text} (${new URL(annotation.url).hostname})`;
+                }
+                else {
+                    li.textContent = `${annotation.text} (${new URL(annotation.url).hostname})`;
+                }
+                const deleteIcon = document.createElement('span');
+                deleteIcon.textContent = ' \u2716';
+                deleteIcon.style.color = 'red';
+                deleteIcon.style.cursor = 'pointer';
+                deleteIcon.style.marginLeft = '5px';
+                deleteIcon.addEventListener('click', () => {
+                    deleteAnnotation(annotation);
                 });
-                const moreLi = document.createElement('li');
-                moreLi.textContent = '...more';
-                moreLi.classList.add('more-item');
-                moreLi.addEventListener('click', () => {
-                    displayAllAnnotations(annotations);
+                li.appendChild(deleteIcon);
+                annotationList.appendChild(li);
+            });
+            const moreLi = document.createElement('li');
+            moreLi.textContent = '...more';
+            moreLi.classList.add('more-item');
+            moreLi.addEventListener('click', () => {
+                displayAllAnnotations(annotations);
+            });
+            annotationList.appendChild(moreLi);
+        } else {
+            const reversedAnnotations = rannotations.slice().reverse();
+            reversedAnnotations.forEach(annotation => {
+                const li = document.createElement('li');
+                li.style.color = annotation.color;
+                if (annotation.type == 'note') {
+                    li.textContent = `${annotation.select}: ${annotation.text} (${new URL(annotation.url).hostname})`;
+                }
+                else {
+                    li.textContent = `${annotation.text} (${new URL(annotation.url).hostname})`;
+                }
+                const deleteIcon = document.createElement('span');
+                deleteIcon.textContent = ' \u2716';
+                deleteIcon.style.color = 'red';
+                deleteIcon.style.cursor = 'pointer';
+                deleteIcon.style.marginLeft = '5px';
+                deleteIcon.addEventListener('click', () => {
+                    deleteAnnotation(annotation);
                 });
-                annotationList.appendChild(moreLi);
-            } else {
-                reversedAnnotations.forEach(annotation => {
-                    createAnnotationListItem(annotation, annotationList);
-                });
-            }
-        });
-    }
+                li.appendChild(deleteIcon);
+                annotationList.appendChild(li);
+            });
+        }
+    });
+}
 
-    function createAnnotationListItem(annotation, annotationList) {
+function displayAllAnnotations(annotations) {
+    const annotationList = document.getElementById('annotationList');
+    annotationList.innerHTML = ''; 
+
+    const date = new Date(annotations[0].timestamp).toLocaleDateString();
+    const dateHeader = document.createElement('li');
+    dateHeader.textContent = date;
+    dateHeader.style.fontWeight = 'bold';
+    dateHeader.style.color = '#CBCED8';
+    annotationList.appendChild(dateHeader);
+
+    annotations.forEach(annotation => {
         const li = document.createElement('li');
         li.style.color = annotation.color;
-        li.textContent = annotation.type === 'note'
-            ? `${annotation.select} : ${annotation.text} (${new URL(annotation.url).hostname})`
-            : `${annotation.text} (${new URL(annotation.url).hostname})`;
-
+        if (annotation.type === 'note') {
+            li.textContent = `${annotation.select}: ${annotation.text} (${new URL(annotation.url).hostname})`;
+        } else {
+            li.textContent = `${annotation.text} (${new URL(annotation.url).hostname})`;
+        }
         const deleteIcon = document.createElement('span');
         deleteIcon.textContent = ' \u2716';
         deleteIcon.style.color = 'red';
@@ -109,25 +163,10 @@ document.addEventListener('DOMContentLoaded', () => {
         });
         li.appendChild(deleteIcon);
         annotationList.appendChild(li);
-    }
+    });
+}
 
-    function displayAllAnnotations(annotations) {
-        const annotationList = document.getElementById('annotationList');
-        annotationList.innerHTML = '';
-
-        const date = new Date(annotations[0].timestamp).toLocaleDateString();
-        const dateHeader = document.createElement('li');
-        dateHeader.textContent = date;
-        dateHeader.style.fontWeight = 'bold';
-        dateHeader.style.color = '#CBCED8';
-        annotationList.appendChild(dateHeader);
-
-        annotations.forEach(annotation => {
-            createAnnotationListItem(annotation, annotationList);
-        });
-    }
-
-    // Search functionality for annotations
+function addSearchButtonEventListener() {
     document.getElementById('searchBtn').addEventListener('click', () => {
         const searchTerm = document.getElementById('searchInput').value.toLowerCase();
         chrome.storage.sync.get({ annotations: [] }, (data) => {
@@ -141,40 +180,19 @@ document.addEventListener('DOMContentLoaded', () => {
             displayFilteredAnnotations(filteredAnnotations);
         });
     });
+}
 
-    function displayFilteredAnnotations(annotations) {
-        const annotationList = document.getElementById('annotationList');
-        annotationList.innerHTML = '';
-
-        const groupedAnnotations = groupAnnotationsByDate(annotations);
-        const dates = Object.keys(groupedAnnotations).sort((a, b) => new Date(b) - new Date(a));
-
-        dates.forEach(date => {
-            const dateHeader = document.createElement('li');
-            dateHeader.textContent = date;
-            dateHeader.style.fontWeight = 'bold';
-            dateHeader.style.color = '#CBCED8';
-            annotationList.appendChild(dateHeader);
-
-            const dateAnnotations = groupedAnnotations[date];
-            dateAnnotations.forEach(annotation => {
-                createAnnotationListItem(annotation, annotationList);
-            });
+function deleteAnnotation(annotationToDelete) {
+    chrome.storage.sync.get({ annotations: [] }, (data) => {
+        const annotations = data.annotations;
+        const updatedAnnotations = annotations.filter(annotation => annotation.timestamp !== annotationToDelete.timestamp);
+        chrome.storage.sync.set({ annotations: updatedAnnotations }, () => {
+            const groupedAnnotations = groupAnnotationsByDate(updatedAnnotations);
+            displayAnnotations(groupedAnnotations);
         });
-    }
+    });
+}
 
-    function deleteAnnotation(annotationToDelete) {
-        chrome.storage.sync.get({ annotations: [] }, (data) => {
-            const annotations = data.annotations.filter(annotation => annotation.timestamp !== annotationToDelete.timestamp);
-            chrome.storage.sync.set({ annotations }, () => {
-                const groupedAnnotations = groupAnnotationsByDate(annotations);
-                displayAnnotations(groupedAnnotations);
-            });
-        });
-    }
-});
-
-// Export annotations functionality
 document.getElementById('exportIcon').addEventListener('click', () => {
     exportAnnotations();
 });
@@ -205,13 +223,13 @@ function exportAnnotations() {
         const blob = new Blob([exportText], { type: 'text/plain' });
         const url = URL.createObjectURL(blob);
 
-        // Temporary link for downloading the export
+        //temp div download ke liye
         const a = document.createElement('a');
         a.href = url;
         a.download = 'annotations.txt';
         document.body.appendChild(a);
         a.click();
         document.body.removeChild(a);
-        URL.revokeObjectURL(url);
+        URL.revokeObjectURL(url); 
     });
 }

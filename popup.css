@@ -1,134 +1,123 @@
-@import url('https://fonts.googleapis.com/css2?family=Eczar:wght@400..800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400..700&display=swap');
 
-/* Global styles */
 * {
-    font-family: "Eczar", serif;
-    font-optical-sizing: auto;
-    font-style: normal;
+    font-family: "Roboto", sans-serif;
+    font-size: 16px;
 }
 
-/* Custom scrollbar styling */
 body::-webkit-scrollbar {
-    width: 7px; 
+    width: 6px; 
 }
 
 body::-webkit-scrollbar-track {
-    background: #121212; 
+    background: #1a1a1a; 
 }
 
 body::-webkit-scrollbar-thumb {
     background: #888; 
-    border-radius: 10px; 
+    border-radius: 8px; 
 }
 
 body::-webkit-scrollbar-thumb:hover {
-    background: #555; 
+    background: #666; 
 }
 
-/* General body styling */
 body {
-    padding: 10px;
-    width: 280px;
-    color: #bb86fc;
-    background-color: #121212;
+    padding: 8px;
+    width: 260px;
+    color: #e0e0e0;
+    background-color: #1a1a1a;
     display: flex;
     flex-direction: column;
     align-items: center;
 }
 
 h1 {
-    font-size: 20px;
-    margin-bottom: 10px;
-    color: #ff7597;
+    font-size: 18px;
+    margin-bottom: 8px;
+    color: #ff9999;
 }
 
-div {
-    margin-bottom: 15px;
+.section {
+    margin-bottom: 12px;
 }
 
-/* Label styling for highlight color */
-.highlightlabel {
-    margin-right: 15px;
+.label-highlight {
+    margin-right: 12px;
     font-size: 14px;
+    color: #b3b3b3;
 }
 
 input {
-    background-color: #121212;
-    color: #bb86fc; /* Ensure text inside input is visible */
+    background-color: #292929;
+    color: #e0e0e0;
+    border: none;
+    padding: 6px;
 }
 
-/* Button styling */
 button {
-    margin-right: 5px;
-    padding: 7px 14px;
-    background-color: black;
-    color: whitesmoke;
+    margin-right: 4px;
+    padding: 6px 12px;
+    background-color: #333;
+    color: #fff;
     border: none;
-    margin: 1px;
-    border-radius: 4px; /* Rounded corners for buttons */
 }
 
 button:hover {
     cursor: pointer;
-    border: 1px solid white;
-    margin: 0;
+    border: 1px solid #fff;
 }
 
-/* Flexbox for button container */
 .buttons {
     display: flex;
-    gap: 10px;
+    gap: 8px;
 }
 
-#highlightBtn {
-    margin-right: 5px;
+#btnHighlight {
+    margin-right: 4px;
 }
 
-/* Annotation list styling */
-#annotationList {
+.annotation-list {
     list-style-type: none;
     padding: 0;
 }
 
-#annotationList li {
-    margin-bottom: 15px;
+.annotation-list-item {
+    margin-bottom: 12px;
 }
 
-/* Search input styling */
-.searchinput {
-    color: aliceblue;
+.search-box {
+    color: #e0e0e0;
+    background-color: #292929;
     border: none;
-    padding: 5px; /* Added padding for better usability */
+    padding: 6px;
 }
 
-/* Annotations header and export icon styling */
-.annoexp {
+.annotation-header {
     width: 100%;
     display: flex;
-    gap: 20px;
     justify-content: space-between;
 }
 
-.ayush {
-    min-width: 80%;
-}
-
-img {
-    object-fit: contain;
+.annotation-header img {
+    width: 18px;
+    height: 18px;
+    object-fit: cover;
     cursor: pointer;
 }
 
-#searchBtn {
-    padding: 4px 8px;
-    border-radius: 5px;
+#btnSearch {
+    padding: 3px 6px;
+    border-radius: 4px;
+    background-color: #333;
+    color: #fff;
+    border: none;
 }
 
-#searchBtn:hover {
-    background-color: gray;
-    border-color: gray;
+#btnSearch:hover {
+    background-color: #666;
 }
 
-/* Style for the "more" item in annotation list */
 .more-item {
     cursor: pointer;
 }
@@ -137,26 +126,21 @@ img {
     text-decoration: underline;
 }
 
-/* Responsive styling for small widths */
-@media (max-width: 280px) {
+@media (max-width: 260px) {
     body {
-        padding: 5px;
+        padding: 4px;
     }
 
     h1 {
-        font-size: 1.2em;
+        font-size: 16px;
     }
 
     button {
-        font-size: 0.9em;
-        padding: 8px;
+        font-size: 14px;
+        padding: 5px 10px;
     }
 
     input[type="color"] {
-        height: 30px;
-    }
-
-    .annoexp {
-        gap: 5px;
+        height: 28px;
     }
 }
