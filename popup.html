@@ -1,44 +1,32 @@
-<!-- <!DOCTYPE html>
+<!DOCTYPE html>
 <html>
-<head>
-  <title>Webpage Annotator</title>
-  <style>
-    body {
-      width: 300px;
-      font-family: Arial, sans-serif;
-    }
-    .color-picker {
-      margin-bottom: 10px;
-    }
-  </style>
-</head>
-<body>
-  <h1>Annotator Settings</h1>
-  <div class="color-picker">
-    <label for="highlightColor">Highlight Color:</label>
-    <input type="color" id="highlightColor">
-  </div>
-  <button id="exportAnnotations">Export Annotations</button>
-  <script src="popup.js"></script>
-</body>
-</html> -->
 
-
-<!-- <!DOCTYPE html>
-<html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Web Annotator</title>
-  <link rel="stylesheet" href="popup.css">
+    <link rel="stylesheet" href="styles.css">
 </head>
+
 <body>
-  <div id="annotationMenu">
-    <button class="colorBtn" id="yellowBtn"></button>
-    <button class="colorBtn" id="cyanBtn"></button>
-    <button class="colorBtn" id="magentaBtn"></button>
-    <button class="colorBtn" id="orangeBtn"></button>
-  </div>
-  <script src="popup.js"></script>
+    <h1>ElderScroll</h1>
+    <div>
+        <label for="highlightColor" class="highlightlabel">Highlight Color:</label>
+        <input type="color" id="highlightColor" name="highlightColor" value="#03daf6">
+    </div>
+    <div class="buttons">
+        <button id="highlightBtn">Highlight</button>
+        <button id="noteBtn">Add Note</button>
+    </div>
+    <div>
+        <input class="searchinput" type="text" id="searchInput" placeholder="Search annotations">
+        <button id="searchBtn">Search</button>
+    </div>
+    <div class="annotation-section">
+        <div class="annotation-header">
+            <h2>Annotations</h2>
+            <img id="exportIcon" src="https://cdn-icons-png.flaticon.com/128/10118/10118878.png" alt="export" width="15">
+        </div>
+        <ul id="annotationList"></ul>
+    </div>
+    <script src="popup.js"></script>
 </body>
-</html> -->
+
+</html>

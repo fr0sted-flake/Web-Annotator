@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "manifest_version": 3,
   "description": "Automatically highlight selected text in yellow.",
-  "permissions": ["activeTab", "scripting", "storage"],
+  "permissions": ["activeTab", "scripting", "storage","commands"],
   "content_scripts": [
     {
       "matches": ["<all_urls>"],
@@ -13,13 +13,30 @@
   "background": {
     "service_worker": "background.js"
   },
+  "commands": {
+    "highlight-text": {
+      "suggested_key": {
+        "default": "Ctrl+I",
+        "mac": "Command+I"
+      },
+      "description": "Highlight selected text"
+    },
+    "add-note": {
+      "suggested_key": {
+        "default": "Ctrl+B",
+        "mac": "Command+B"
+      },
+      "description": "Add note to selected text"
+    }
+  },
   "action": {
     "default_icon": {
       "16": "assets/ext-icon.png",
       "48": "assets/ext-icon.png",
       "128": "assets/ext-icon.png"
     },
-    "default_title": "Web Annotator"
+    "default_title": "Web Annotator",
+    "default_popup": "popup.html"
   },
   "icons": {
     "16": "assets/ext-icon.png",

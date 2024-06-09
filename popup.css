@@ -1,46 +1,162 @@
-/* .highlight {
-  background-color: yellow;
-  cursor: pointer;
+@import url('https://fonts.googleapis.com/css2?family=Eczar:wght@400..800&display=swap');
+
+/* Global styles */
+* {
+    font-family: "Eczar", serif;
+    font-optical-sizing: auto;
+    font-style: normal;
 }
 
-.highlight.note::after {
-  content: ' 📝';
-  font-size: 0.8em;
-  color: gray;
-  cursor: pointer;
-} */
-
-
-/* body {
-  width: 120px;
-  padding: 5px;
+/* Custom scrollbar styling */
+body::-webkit-scrollbar {
+    width: 7px; 
 }
 
-#annotationMenu {
-  display: flex;
-  flex-wrap: wrap;
+body::-webkit-scrollbar-track {
+    background: #121212; 
 }
 
-.colorBtn {
-  width: 30px;
-  height: 30px;
-  border: none;
-  margin: 5px;
-  cursor: pointer;
+body::-webkit-scrollbar-thumb {
+    background: #888; 
+    border-radius: 10px; 
 }
 
-#yellowBtn {
-  background-color: yellow;
+body::-webkit-scrollbar-thumb:hover {
+    background: #555; 
 }
 
-#cyanBtn {
-  background-color: cyan;
+/* General body styling */
+body {
+    padding: 10px;
+    width: 280px;
+    color: #bb86fc;
+    background-color: #121212;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
 
-#magentaBtn {
-  background-color: magenta;
+h1 {
+    font-size: 20px;
+    margin-bottom: 10px;
+    color: #ff7597;
 }
 
-#orangeBtn {
-  background-color: orange;
-} */
+div {
+    margin-bottom: 15px;
+}
+
+/* Label styling for highlight color */
+.highlightlabel {
+    margin-right: 15px;
+    font-size: 14px;
+}
+
+input {
+    background-color: #121212;
+    color: #bb86fc; /* Ensure text inside input is visible */
+}
+
+/* Button styling */
+button {
+    margin-right: 5px;
+    padding: 7px 14px;
+    background-color: black;
+    color: whitesmoke;
+    border: none;
+    margin: 1px;
+    border-radius: 4px; /* Rounded corners for buttons */
+}
+
+button:hover {
+    cursor: pointer;
+    border: 1px solid white;
+    margin: 0;
+}
+
+/* Flexbox for button container */
+.buttons {
+    display: flex;
+    gap: 10px;
+}
+
+#highlightBtn {
+    margin-right: 5px;
+}
+
+/* Annotation list styling */
+#annotationList {
+    list-style-type: none;
+    padding: 0;
+}
+
+#annotationList li {
+    margin-bottom: 15px;
+}
+
+/* Search input styling */
+.searchinput {
+    color: aliceblue;
+    border: none;
+    padding: 5px; /* Added padding for better usability */
+}
+
+/* Annotations header and export icon styling */
+.annoexp {
+    width: 100%;
+    display: flex;
+    gap: 20px;
+    justify-content: space-between;
+}
+
+.ayush {
+    min-width: 80%;
+}
+
+img {
+    object-fit: contain;
+    cursor: pointer;
+}
+
+#searchBtn {
+    padding: 4px 8px;
+    border-radius: 5px;
+}
+
+#searchBtn:hover {
+    background-color: gray;
+    border-color: gray;
+}
+
+/* Style for the "more" item in annotation list */
+.more-item {
+    cursor: pointer;
+}
+
+.more-item:hover {
+    text-decoration: underline;
+}
+
+/* Responsive styling for small widths */
+@media (max-width: 280px) {
+    body {
+        padding: 5px;
+    }
+
+    h1 {
+        font-size: 1.2em;
+    }
+
+    button {
+        font-size: 0.9em;
+        padding: 8px;
+    }
+
+    input[type="color"] {
+        height: 30px;
+    }
+
+    .annoexp {
+        gap: 5px;
+    }
+}

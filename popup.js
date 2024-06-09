@@ -1,125 +1,217 @@
-// document.getElementById('highlightColor').addEventListener('input', function(event) {
-//     localStorage.setItem('highlightColor', event.target.value);
-//   });
-  
-//   document.getElementById('exportAnnotations').addEventListener('click', function() {
-//     chrome.storage.sync.get('annotations', (data) => {
-//       let annotations = data.annotations || [];
-//       let blob = new Blob([JSON.stringify(annotations, null, 2)], { type: 'application/json' });
-//       let url = URL.createObjectURL(blob);
-//       chrome.downloads.download({
-//         url: url,
-//         filename: 'annotations.json'
-//       });
-//     });
-//   });
-  
-// const highlightColor = "rgb(213, 234, 255)";
+document.addEventListener('DOMContentLoaded', () => {
+    // Load the stored highlight color or set a default color
+    chrome.storage.sync.get('highlightColor', (data) => {
+        const color = data.highlightColor || '#03daf6';
+        document.getElementById('highlightColor').value = color;
+    });
 
-// const template = `
-//   <template id="highlightTemplate">
-//     <span class="highlight" style="background-color: ${highlightColor}; display: inline"></span>
-//   </template>
-//   <button id="mediumHighlighter">
-//     <svg class="text-marker" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 544 512"><path d="M0 479.98L99.92 512l35.45-35.45-67.04-67.04L0 479.98zm124.61-240.01a36.592 36.592 0 0 0-10.79 38.1l13.05 42.83-50.93 50.94 96.23 96.23 50.86-50.86 42.74 13.08c13.73 4.2 28.65-.01 38.15-10.78l35.55-41.64-173.34-173.34-41.52 35.44zm403.31-160.7l-63.2-63.2c-20.49-20.49-53.38-21.52-75.12-2.35L190.55 183.68l169.77 169.78L530.27 154.4c19.18-21.74 18.15-54.63-2.35-75.13z"></path></svg>
-//   </button>
-// `;
+    // Update the highlight color when changed
+    document.getElementById('highlightColor').addEventListener('change', (event) => {
+        chrome.storage.sync.set({ highlightColor: event.target.value });
+    });
 
+    // Highlight selected text with the chosen color
+    document.getElementById('highlightBtn').addEventListener('click', () => {
+        chrome.storage.sync.get('highlightColor', (data) => {
+            const color = data.highlightColor || '#03daf6';
+            chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+                chrome.tabs.sendMessage(tabs[0].id, { action: 'highlight', color });
+            });
+        });
+    });
 
-// const styled = ({ display = "none", left = 0, top = 0 }) => `
-//   #mediumHighlighter {
-//     align-items: center;
-//     background-color: black;
-//     border-radius: 5px;
-//     border: none;
-//     cursor: pointer;
-//     display: ${display};
-//     justify-content: center;
-//     left: ${left}px;
-//     padding: 5px 10px;
-//     position: fixed;
-//     top: ${top}px;
-//     width: 40px;
-//     z-index: 9999;
-//   }
-//   .text-marker {
-//     fill: white;
-//   }
-//   .text-marker:hover {
-//     fill: ${highlightColor};
-//   }
-// `;
+    // Add a note to the selected text with the chosen color
+    document.getElementById('noteBtn').addEventListener('click', () => {
+        chrome.storage.sync.get('highlightColor', (data) => {
+            const color = data.highlightColor || '#03daf6';
+            chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+                chrome.tabs.sendMessage(tabs[0].id, { action: 'addNote', color });
+            });
+        });
+    });
 
+    // Load and display annotations
+    chrome.storage.sync.get({ annotations: [] }, (data) => {
+        const annotations = data.annotations;
+        const groupedAnnotations = groupAnnotationsByDate(annotations);
+        displayAnnotations(groupedAnnotations);
+    });
 
-// class MediumHighlighter extends HTMLElement {
-//   get markerPosition() {
-//     return JSON.parse(this.getAttribute("markerPosition") || "{}");
-//   }
+    function groupAnnotationsByDate(annotations) {
+        const grouped = {};
 
-//   get styleElement() {
-//     return this.shadowRoot.querySelector("style");
-//   }
+        annotations.forEach(annotation => {
+            const date = new Date(annotation.timestamp).toLocaleDateString();
+            if (!grouped[date]) {
+                grouped[date] = [];
+            }
+            grouped[date].push(annotation);
+        });
 
-//   get highlightTemplate() {
-//     return this.shadowRoot.getElementById("highlightTemplate");
-//   }
+        for (const date in grouped) {
+            grouped[date].sort((a, b) => b.timestamp - a.timestamp);
+        }
 
-//   static get observedAttributes() {
-//     return ["markerPosition"];
-//   }
+        return grouped;
+    }
 
-//   constructor() {
-//     super();
-//     this.render();
-//   }
+    function displayAnnotations(groupedAnnotations) {
+        const annotationList = document.getElementById('annotationList');
+        annotationList.innerHTML = '';
 
-//   render() {
-//     this.attachShadow({ mode: "open" });
-//     const style = document.createElement("style");
-//     style.textContent = styled({});
-//     this.shadowRoot.appendChild(style);
-//     this.shadowRoot.innerHTML += template;
-//     this.shadowRoot
-//       .getElementById("mediumHighlighter")
-//       .addEventListener("click", () => this.highlightSelection());
-//   }
+        // Sort dates in descending order
+        const dates = Object.keys(groupedAnnotations).sort((a, b) => new Date(b) - new Date(a));
 
-//   attributeChangedCallback(name, oldValue, newValue) {
-//     if (name === "markerPosition") {
-//       this.styleElement.textContent = styled(this.markerPosition);
-//     }
-//   }
+        dates.forEach(date => {
+            const dateHeader = document.createElement('li');
+            dateHeader.textContent = date;
+            dateHeader.style.fontWeight = 'bold';
+            dateHeader.style.color = '#CBCED8';
+            annotationList.appendChild(dateHeader);
 
-//   highlightSelection() {
-//     var userSelection = window.getSelection();
-//     for (let i = 0; i < userSelection.rangeCount; i++) {
-//       this.highlightRange(userSelection.getRangeAt(i));
-//     }
-//     window.getSelection().empty();
-//   }
+            const annotations = groupedAnnotations[date];
+            const reversedAnnotations = annotations.slice().reverse();
 
-//   highlightRange(range) {
-//     const clone =
-//       this.highlightTemplate.cloneNode(true).content.firstElementChild;
-//     clone.appendChild(range.extractContents());
-//     range.insertNode(clone);
-//   }
-// }
+            if (reversedAnnotations.length > 3) {
+                const recentAnnotations = reversedAnnotations.slice(-3).reverse();
+                recentAnnotations.forEach(annotation => {
+                    createAnnotationListItem(annotation, annotationList);
+                });
+                const moreLi = document.createElement('li');
+                moreLi.textContent = '...more';
+                moreLi.classList.add('more-item');
+                moreLi.addEventListener('click', () => {
+                    displayAllAnnotations(annotations);
+                });
+                annotationList.appendChild(moreLi);
+            } else {
+                reversedAnnotations.forEach(annotation => {
+                    createAnnotationListItem(annotation, annotationList);
+                });
+            }
+        });
+    }
 
-// window.customElements.define("medium-highlighter", MediumHighlighter);
+    function createAnnotationListItem(annotation, annotationList) {
+        const li = document.createElement('li');
+        li.style.color = annotation.color;
+        li.textContent = annotation.type === 'note'
+            ? `${annotation.select} : ${annotation.text} (${new URL(annotation.url).hostname})`
+            : `${annotation.text} (${new URL(annotation.url).hostname})`;
 
+        const deleteIcon = document.createElement('span');
+        deleteIcon.textContent = ' \u2716';
+        deleteIcon.style.color = 'red';
+        deleteIcon.style.cursor = 'pointer';
+        deleteIcon.style.marginLeft = '5px';
+        deleteIcon.addEventListener('click', () => {
+            deleteAnnotation(annotation);
+        });
+        li.appendChild(deleteIcon);
+        annotationList.appendChild(li);
+    }
 
-// document.addEventListener('DOMContentLoaded', function() {
-//   var colors = ['yellow', 'cyan', 'magenta', 'orange'];
-//   colors.forEach(function(color) {
-//     var button = document.createElement('button');
-//     button.className = 'colorBtn';
-//     button.style.backgroundColor = color;
-//     button.onclick = function() {
-//       chrome.tabs.query({ active: true, currentWindow: true }, function(tabs) {
-//         chrome.tabs.sendMessage(tabs[0].id, { action: 'highlight', color: color });
-//       });
-//     };
-//     document.getElementById('annotationMenu').appendChild(button);
-//   });
-// });
+    function displayAllAnnotations(annotations) {
+        const annotationList = document.getElementById('annotationList');
+        annotationList.innerHTML = '';
+
+        const date = new Date(annotations[0].timestamp).toLocaleDateString();
+        const dateHeader = document.createElement('li');
+        dateHeader.textContent = date;
+        dateHeader.style.fontWeight = 'bold';
+        dateHeader.style.color = '#CBCED8';
+        annotationList.appendChild(dateHeader);
+
+        annotations.forEach(annotation => {
+            createAnnotationListItem(annotation, annotationList);
+        });
+    }
+
+    // Search functionality for annotations
+    document.getElementById('searchBtn').addEventListener('click', () => {
+        const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+        chrome.storage.sync.get({ annotations: [] }, (data) => {
+            const annotations = data.annotations;
+            const filteredAnnotations = annotations.filter(annotation => {
+                const annotationText = annotation.type === 'note'
+                    ? `${annotation.select}: ${annotation.text}`
+                    : annotation.text;
+                return annotationText.toLowerCase().includes(searchTerm);
+            });
+            displayFilteredAnnotations(filteredAnnotations);
+        });
+    });
+
+    function displayFilteredAnnotations(annotations) {
+        const annotationList = document.getElementById('annotationList');
+        annotationList.innerHTML = '';
+
+        const groupedAnnotations = groupAnnotationsByDate(annotations);
+        const dates = Object.keys(groupedAnnotations).sort((a, b) => new Date(b) - new Date(a));
+
+        dates.forEach(date => {
+            const dateHeader = document.createElement('li');
+            dateHeader.textContent = date;
+            dateHeader.style.fontWeight = 'bold';
+            dateHeader.style.color = '#CBCED8';
+            annotationList.appendChild(dateHeader);
+
+            const dateAnnotations = groupedAnnotations[date];
+            dateAnnotations.forEach(annotation => {
+                createAnnotationListItem(annotation, annotationList);
+            });
+        });
+    }
+
+    function deleteAnnotation(annotationToDelete) {
+        chrome.storage.sync.get({ annotations: [] }, (data) => {
+            const annotations = data.annotations.filter(annotation => annotation.timestamp !== annotationToDelete.timestamp);
+            chrome.storage.sync.set({ annotations }, () => {
+                const groupedAnnotations = groupAnnotationsByDate(annotations);
+                displayAnnotations(groupedAnnotations);
+            });
+        });
+    }
+});
+
+// Export annotations functionality
+document.getElementById('exportIcon').addEventListener('click', () => {
+    exportAnnotations();
+});
+
+function exportAnnotations() {
+    chrome.storage.sync.get({ annotations: [] }, (data) => {
+        const annotations = data.annotations;
+
+        const highlights = annotations.filter(annotation => annotation.type === 'highlight');
+        const notes = annotations.filter(annotation => annotation.type === 'note');
+
+        let exportText = '';
+
+        if (highlights.length > 0) {
+            exportText += 'Highlights:\n';
+            highlights.forEach(highlight => {
+                exportText += `- Text: ${highlight.text}\n  Color: ${highlight.color}\n  URL: ${highlight.url}\n\n`;
+            });
+        }
+
+        if (notes.length > 0) {
+            exportText += 'Notes:\n';
+            notes.forEach(note => {
+                exportText += `- Text: ${note.text}\n  Color: ${note.color}\n  URL: ${note.url}\n  Selected Text: ${note.select}\n\n`;
+            });
+        }
+
+        const blob = new Blob([exportText], { type: 'text/plain' });
+        const url = URL.createObjectURL(blob);
+
+        // Temporary link for downloading the export
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'annotations.txt';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+    });
+}
