@@ -1,22 +1,48 @@
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
-    if (request.action === 'highlight') {
-        applyHighlight(request.color);
-    } else if (request.action === 'addNote') {
-        createNoteWithHighlight(request.color);
+    try {
+        // Check if the request is valid
+        if (!request || !request.action || !request.color) {
+            throw new Error('Invalid message format');
+        }
+
+        
+        console.log('Received message:', request);
+
+        // Check the action type and execute corresponding function
+        switch (request.action) {
+            case 'highlight':
+                applyHighlight(request.color);
+                break;
+            case 'addNote':
+                createNoteWithHighlight(request.color);
+                break;
+            default:
+                throw new Error('Unknown action: ' + request.action);
+        }
+    } catch (error) {
+        
+        console.error('Error while receiving the message:', error);
     }
 });
 
+
 function applyHighlight(color) {
-    const userSelection = window.getSelection();
-    if (!userSelection.rangeCount) {
-        alert('Please select some text to highlight.');
-        return;
-    }
+    try {
+        const userSelection = window.getSelection();
+        
+        // Check if user selection exists
+        if (!userSelection || !userSelection.rangeCount) {
+            throw new Error('No text selected');
+        }
 
-    const selectedRange = userSelection.getRangeAt(0);
-    const selectedText = selectedRange.toString();
+        const selectedRange = userSelection.getRangeAt(0);
+        const selectedText = selectedRange.toString();
 
-    if (selectedText) {
+        // Check if selected text exists
+        if (!selectedText.trim()) {
+            throw new Error('Empty selection');
+        }
+
         const highlightSpan = document.createElement('span');
         highlightSpan.style.backgroundColor = color;
 
@@ -29,7 +55,7 @@ function applyHighlight(color) {
 
         highlightSpan.appendChild(extractedContent);
         selectedRange.insertNode(highlightSpan);
-        userSelection.removeAllRanges();
+        // userSelection.removeAllRanges();
 
         const uniqueSelector = generateUniqueSelector(highlightSpan.parentElement);
 
@@ -42,19 +68,28 @@ function applyHighlight(color) {
             selector: uniqueSelector
         };
 
+        // Save annotation to storage
         chrome.storage.sync.get({ annotations: [] }, (data) => {
             const annotationsList = data.annotations;
             annotationsList.push(newAnnotation);
-            chrome.storage.sync.set({ annotations: annotationsList });
+            chrome.storage.sync.set({ annotations: annotationsList }, () => {
+                console.log('Highlight annotation saved:', newAnnotation);
+            });
         });
-
-    } else {
-        alert('Please select any text to highlight.');
+    } catch (error) {
+       
+        console.error('Error applying highlight:', error);
+        alert('Error applying highlight: ' + error.message);
     }
 }
 
+
 function createNoteWithHighlight(color) {
     const userSelection = window.getSelection();
+    if (!userSelection.rangeCount) {
+        alert('Please select some text to add note there.');
+        return;
+    }
     if (userSelection.rangeCount > 0) {
         const selectedRange = userSelection.getRangeAt(0);
         const selectedText = selectedRange.toString();
@@ -63,13 +98,14 @@ function createNoteWithHighlight(color) {
 
         const noteElement = document.createElement('div');
         noteElement.contentEditable = true;
-        noteElement.style.border = '0.5px dashed black';
+        noteElement.style.border = '0.5px solid black';
         noteElement.style.backgroundColor = color;
         noteElement.style.display = 'inline-block';
-        noteElement.style.marginLeft = '5px';
+        noteElement.style.marginLeft = '4px';
         noteElement.style.padding = '3px';
-        noteElement.style.fontSize = '0.8em';
-        noteElement.textContent = 'add note...';
+        noteElement.style.fontSize = '0.75em';
+        noteElement.style.borderRadius = '8px';
+        noteElement.textContent = 'Add a note here';
         selectedRange.collapse(false);
         selectedRange.insertNode(noteElement);
 
@@ -102,6 +138,8 @@ function createNoteWithHighlight(color) {
                 }
             });
         });
+        // Set focus on the note element
+        noteElement.focus();
     }
 }
 
@@ -134,6 +172,5 @@ function reloadAnnotations() {
     });
 }
 
-// document.addEventListener('DOMContentLoaded', reloadAnnotations);
-reloadAnnotations();
+document.addEventListener('DOMContentLoaded', reloadAnnotations);
 

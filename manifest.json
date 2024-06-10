@@ -27,7 +27,7 @@
       },
       "description": "Highlight the selected text"
     },
-    "add-notes": {
+    "addNote": {
       "suggested_key": {
         "default": "Ctrl+Shift+K",
         "mac": "Command+Shift+K"

@@ -10,7 +10,7 @@ function retrieveHighlightColorAndSendMessage(action) {
 chrome.commands.onCommand.addListener((command) => {
   if (command === "highlight") {
     retrieveHighlightColorAndSendMessage("highlight");
-  } else if (command === "add-notes") {
+  } else if (command === "addNote") {
     retrieveHighlightColorAndSendMessage("addNote");
   }
 });
