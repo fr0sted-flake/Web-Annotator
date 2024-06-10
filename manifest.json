@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "manifest_version": 3,
   "description": "Annotate webpages in one click.",
-  "permissions": ["activeTab", "scripting", "storage","commands"],
+  "permissions": ["activeTab", "scripting", "storage", "commands"],
   "content_scripts": [
     {
       "matches": ["<all_urls>"],
@@ -13,15 +13,21 @@
   "background": {
     "service_worker": "background.js"
   },
+  "web_accessible_resources": [
+    {
+      "resources": ["../jspdf.umd.min.js"],
+      "matches": ["<all_urls>"]
+    }
+  ],
   "commands": {
-    "highlight-text": {
+    "highlight": {
       "suggested_key": {
         "default": "Ctrl+Shift+H",
         "mac": "Command+Shift+H"
       },
       "description": "Highlight the selected text"
     },
-    "add-note": {
+    "add-notes": {
       "suggested_key": {
         "default": "Ctrl+Shift+K",
         "mac": "Command+Shift+K"
@@ -42,11 +48,5 @@
     "16": "assets/ext-icon.png",
     "48": "assets/ext-icon.png",
     "128": "assets/ext-icon.png"
-  },
-  "web_accessible_resources": [
-    {
-        "resources": ["../jspdf.umd.min.js"],
-        "matches": ["<all_urls>"]
-    }
-]
+  }
 }
