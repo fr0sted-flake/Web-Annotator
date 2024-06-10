@@ -1,25 +1,8 @@
-@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@600;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@600;600&display=swap');
 
 * {
     font-family: "Poppins", sans-serif;
     font-size: 14px;
-}
-
-body::-webkit-scrollbar {
-    width: 8px; 
-}
-
-body::-webkit-scrollbar-track {
-    background: #535353; 
-}
-
-body::-webkit-scrollbar-thumb {
-    background: #717171; 
-    border-radius: 10px; 
-}
-
-body::-webkit-scrollbar-thumb:hover {
-    background: #454545; 
 }
 
 body {
@@ -54,6 +37,13 @@ input {
     border: none;
     padding: 8px;
     border-radius: 6px;
+    transition: background-color 0.3s ease, color 0.3s ease;
+    
+}
+
+input:hover {
+    background-color: #444;
+    color: #fff;
 }
 
 button {
@@ -63,10 +53,13 @@ button {
     color: #fff;
     border: none;
     border-radius: 6px;
+    transition: background-color 0.3s ease, border 0.3s ease; /* Added transition for border */
+    transition: border 0.3s ease, color 0.3s ease;
 }
 
 button:hover {
     cursor: pointer;
+    background-color: #333;
     border: 1px solid #fff;
 }
 
@@ -94,6 +87,12 @@ button:hover {
     border: none;
     padding: 8px;
     border-radius: 6px;
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.search-box:hover {
+    background-color: #444;
+    color: #fff;
 }
 
 .annotation-header {
@@ -116,6 +115,7 @@ button:hover {
     color: #fff;
     border: none;
     margin-top: 10px;
+    transition: background-color 0.3s ease, border 0.3s ease; /* Added transition for border */
 }
 
 #btnSearch:hover {

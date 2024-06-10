@@ -2,7 +2,7 @@
   "name": "Webpage Annotator",
   "version": "0.1.0",
   "manifest_version": 3,
-  "description": "Automatically highlight selected text in yellow.",
+  "description": "Annotate webpages in one click.",
   "permissions": ["activeTab", "scripting", "storage","commands"],
   "content_scripts": [
     {
@@ -16,17 +16,17 @@
   "commands": {
     "highlight-text": {
       "suggested_key": {
-        "default": "Ctrl+I",
-        "mac": "Command+I"
+        "default": "Ctrl+Shift+H",
+        "mac": "Command+Shift+H"
       },
-      "description": "Highlight selected text"
+      "description": "Highlight the selected text"
     },
     "add-note": {
       "suggested_key": {
-        "default": "Ctrl+B",
-        "mac": "Command+B"
+        "default": "Ctrl+Shift+K",
+        "mac": "Command+Shift+K"
       },
-      "description": "Add note to selected text"
+      "description": "Add note to with selected text"
     }
   },
   "action": {
