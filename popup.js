@@ -8,30 +8,30 @@ document.addEventListener('DOMContentLoaded', () => {
 
 function loadHighlightColor() {
     chrome.storage.sync.get('highlightColor', (data) => {
-        const color = data.highlightColor || '#03daf6'; // Default color
-        document.getElementById('highlightColor').value = color;
+        const color = data.highlightColor || '#f67803'; // Default color
+        document.getElementById('colorInput').value = color;
     });
 }
 
 function addHighlightColorChangeListener() {
-    document.getElementById('highlightColor').addEventListener('change', (event) => {
+    document.getElementById('colorInput').addEventListener('change', (event) => {
         chrome.storage.sync.set({ highlightColor: event.target.value });
     });
 }
 
 function addButtonEventListeners() {
-    document.getElementById('highlightBtn').addEventListener('click', () => {
+    document.getElementById('btnHighlight').addEventListener('click', () => {
         sendMessageToCurrentTab('highlight');
     });
 
-    document.getElementById('noteBtn').addEventListener('click', () => {
+    document.getElementById('btnAddNote').addEventListener('click', () => {
         sendMessageToCurrentTab('addNote');
     });
 }
 
 function sendMessageToCurrentTab(action) {
     chrome.storage.sync.get('highlightColor', (data) => {
-        const color = data.highlightColor || '#03daf6'; // Default color
+        const color = data.highlightColor || '#f67803'; // Default color
         chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
             chrome.tabs.sendMessage(tabs[0].id, { action: action, color: color });
         });
@@ -64,7 +64,7 @@ function groupAnnotationsByDate(annotations) {
 }
 
 function displayAnnotations(groupedAnnotations) {
-    const annotationList = document.getElementById('annotationList');
+    const annotationList = document.getElementById('listAnnotations');
     annotationList.innerHTML = ''; 
 
     const dates = Object.keys(groupedAnnotations).sort((a, b) => new Date(b) - new Date(a));
@@ -135,7 +135,7 @@ function displayAnnotations(groupedAnnotations) {
 }
 
 function displayAllAnnotations(annotations) {
-    const annotationList = document.getElementById('annotationList');
+    const annotationList = document.getElementById('listAnnotations');
     annotationList.innerHTML = ''; 
 
     const date = new Date(annotations[0].timestamp).toLocaleDateString();
@@ -167,8 +167,8 @@ function displayAllAnnotations(annotations) {
 }
 
 function addSearchButtonEventListener() {
-    document.getElementById('searchBtn').addEventListener('click', () => {
-        const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+    document.getElementById('btnSearch').addEventListener('click', () => {
+        const searchTerm = document.getElementById('inputSearch').value.toLowerCase();
         chrome.storage.sync.get({ annotations: [] }, (data) => {
             const annotations = data.annotations;
             const filteredAnnotations = annotations.filter(annotation => {
@@ -182,6 +182,44 @@ function addSearchButtonEventListener() {
     });
 }
 
+function displayFilteredAnnotations(annotations) {
+    const annotationList = document.getElementById('listAnnotations');
+    annotationList.innerHTML = ''; 
+
+    const groupedAnnotations = groupAnnotationsByDate(annotations);
+    const dates = Object.keys(groupedAnnotations).sort((a, b) => new Date(b) - new Date(a));
+
+    dates.forEach(date => {
+        const dateHeader = document.createElement('li');
+        dateHeader.textContent = date;
+        dateHeader.style.fontWeight = 'bold';
+        dateHeader.style.color = '#CBCED8';
+        annotationList.appendChild(dateHeader);
+
+        const dateAnnotations = groupedAnnotations[date];
+
+        dateAnnotations.forEach(annotation => {
+            const li = document.createElement('li');
+            li.style.color = annotation.color;
+            if (annotation.type === 'note') {
+                li.textContent = `${annotation.select}: ${annotation.text} (${new URL(annotation.url).hostname})`;
+            } else {
+                li.textContent = `${annotation.text} (${new URL(annotation.url).hostname})`;
+            }
+            const deleteIcon = document.createElement('span');
+            deleteIcon.textContent = ' \u2716';
+            deleteIcon.style.color = 'red';
+            deleteIcon.style.cursor = 'pointer';
+            deleteIcon.style.marginLeft = '5px';
+            deleteIcon.addEventListener('click', () => {
+                deleteAnnotation(annotation);
+            });
+            li.appendChild(deleteIcon);
+            annotationList.appendChild(li);
+        });
+    })
+}
+
 function deleteAnnotation(annotationToDelete) {
     chrome.storage.sync.get({ annotations: [] }, (data) => {
         const annotations = data.annotations;
@@ -193,43 +231,132 @@ function deleteAnnotation(annotationToDelete) {
     });
 }
 
-document.getElementById('exportIcon').addEventListener('click', () => {
+document.getElementById('btnExport').addEventListener('click', () => {
     exportAnnotations();
 });
 
+// function exportAnnotations() {
+//     chrome.storage.sync.get({ annotations: [] }, (data) => {
+//         const annotations = data.annotations;
+
+//         const highlights = annotations.filter(annotation => annotation.type === 'highlight');
+//         const notes = annotations.filter(annotation => annotation.type === 'note');
+
+//         let exportText = '';
+
+//         if (highlights.length > 0) {
+//             exportText += 'Highlights:\n';
+//             highlights.forEach(highlight => {
+//                 exportText += `- Text: ${highlight.text}\n  Color: ${highlight.color}\n  URL: ${highlight.url}\n\n`;
+//             });
+//         }
+
+//         if (notes.length > 0) {
+//             exportText += 'Notes:\n';
+//             notes.forEach(note => {
+//                 exportText += `- Text: ${note.text}\n  Color: ${note.color}\n  URL: ${note.url}\n  Selected Text: ${note.select}\n\n`;
+//             });
+//         }
+
+//         const blob = new Blob([exportText], { type: 'text/plain' });
+//         const url = URL.createObjectURL(blob);
+
+//         //temp div download ke liye
+//         const a = document.createElement('a');
+//         a.href = url;
+//         a.download = 'annotations.txt';
+//         document.body.appendChild(a);
+//         a.click();
+//         document.body.removeChild(a);
+//         URL.revokeObjectURL(url); 
+//     });
+// }
+
+
 function exportAnnotations() {
+    
+    if (typeof window.jspdf === 'undefined') {
+        console.error('jsPDF is not loaded.');
+        return;
+    }
+
+    const { jsPDF } = window.jspdf;
+
     chrome.storage.sync.get({ annotations: [] }, (data) => {
         const annotations = data.annotations;
 
         const highlights = annotations.filter(annotation => annotation.type === 'highlight');
         const notes = annotations.filter(annotation => annotation.type === 'note');
 
-        let exportText = '';
+        const doc = new jsPDF();
+
+        let yOffset = 10; 
+        const pageWidth = doc.internal.pageSize.getWidth();
+        const margin = 10;
+
+        function addBoldText(text, x, y) {
+            doc.setFont('helvetica', 'bold');
+            doc.text(text, x, y);
+            doc.setFont('helvetica', 'normal'); 
+        }
 
         if (highlights.length > 0) {
-            exportText += 'Highlights:\n';
+            doc.setFontSize(16);
+            addBoldText('Highlights:', 10, yOffset);
+            yOffset += 10;
+
             highlights.forEach(highlight => {
-                exportText += `- Text: ${highlight.text}\n  Color: ${highlight.color}\n  URL: ${highlight.url}\n\n`;
+                doc.setFontSize(10);
+                doc.setTextColor(highlight.color);
+
+                let lines = doc.splitTextToSize(`Highlight: ${highlight.text}`, pageWidth - margin * 2);
+                doc.text(lines, 10, yOffset);
+                yOffset += lines.length * 10;
+
+                doc.setTextColor(0, 0, 0);
+
+                lines = doc.splitTextToSize(`URL: ${highlight.url}`, pageWidth - margin * 2);
+                doc.text(lines, 10, yOffset);
+                yOffset += lines.length *  7;
+
+                const date = new Date(highlight.timestamp).toLocaleString();
+                lines = doc.splitTextToSize(`Date: ${date}`, pageWidth - margin * 2);
+                doc.text(lines, 10, yOffset);
+                yOffset += lines.length * 20;
             });
         }
 
         if (notes.length > 0) {
-            exportText += 'Notes:\n';
+            yOffset += 10; 
+            doc.setFontSize(16);
+            addBoldText('Notes:', 10, yOffset);
+            yOffset += 10;
+
             notes.forEach(note => {
-                exportText += `- Text: ${note.text}\n  Color: ${note.color}\n  URL: ${note.url}\n  Selected Text: ${note.select}\n\n`;
+                doc.setFontSize(10);
+                doc.setTextColor(note.color);
+
+                let lines = doc.splitTextToSize(`Note: ${note.text}`, pageWidth - margin * 2);
+                doc.text(lines, 10, yOffset);
+                yOffset += lines.length *  10;
+
+                doc.setTextColor(0, 0, 0);
+
+                lines = doc.splitTextToSize(`Text: ${note.select}`, pageWidth - margin * 2);
+                doc.text(lines, 10, yOffset);
+                yOffset += lines.length * 7;
+
+                lines = doc.splitTextToSize(`URL: ${note.url}`, pageWidth - margin * 2);
+                doc.text(lines, 10, yOffset);
+                yOffset += lines.length * 7;
+
+                const date = new Date(note.timestamp).toLocaleString();
+                lines = doc.splitTextToSize(`Date: ${date}`, pageWidth - margin * 2);
+                doc.text(lines, 10, yOffset);
+                yOffset += lines.length * 20;
             });
         }
 
-        const blob = new Blob([exportText], { type: 'text/plain' });
-        const url = URL.createObjectURL(blob);
-
-        //temp div download ke liye
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = 'annotations.txt';
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        URL.revokeObjectURL(url); 
+        doc.save('annotations.pdf');
     });
 }

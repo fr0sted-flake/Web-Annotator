@@ -49,7 +49,7 @@ function applyHighlight(color) {
         });
 
     } else {
-        alert('Please select some text to highlight.');
+        alert('Please select any text to highlight.');
     }
 }
 

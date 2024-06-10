@@ -42,5 +42,11 @@
     "16": "assets/ext-icon.png",
     "48": "assets/ext-icon.png",
     "128": "assets/ext-icon.png"
-  }
+  },
+  "web_accessible_resources": [
+    {
+        "resources": ["../jspdf.umd.min.js"],
+        "matches": ["<all_urls>"]
+    }
+]
 }
