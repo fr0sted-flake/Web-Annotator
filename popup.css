@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@600;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@600&display=swap');
 
 * {
     font-family: "Poppins", sans-serif;
@@ -18,10 +18,10 @@ body {
 h1 {
     font-size: 22px;
     margin-bottom: 12px;
-    color: #debebe;
+    color: #d3d69a;
 }
 
-.section {
+.color-picker {
     margin-bottom: 16px;
 }
 
@@ -33,43 +33,38 @@ h1 {
 
 input {
     background-color: #3a3a3a;
-    color: #f1f1f1;
+    color: #bfbaba;
     border: none;
     padding: 8px;
     border-radius: 6px;
-    transition: background-color 0.3s ease, color 0.3s ease;
-    
+    transition: background-color 0.5s ease-in-out, color 0.5s ease-in-out;
 }
 
 input:hover {
-    background-color: #444;
+    background-color: #030303;
     color: #fff;
 }
 
 button {
-    margin-right: 40px; /* Increased from 6px */
+    margin-right: 40px;
     padding: 8px 16px;
-    background-color: #444;
-    color: #fff;
+    background-color: #3a3a3a;
+    color: #bfbaba;
     border: none;
     border-radius: 6px;
-    transition: background-color 0.3s ease, border 0.3s ease; /* Added transition for border */
-    transition: border 0.3s ease, color 0.3s ease;
+    transition: background-color 0.5s ease-in-out, color 0.5s ease-in-out;
 }
 
 button:hover {
     cursor: pointer;
-    background-color: #333;
-    border: 1px solid #fff;
+    background-color: #030303;
+    color: #fff;
 }
 
-.buttons {
+.action-buttons {
     display: flex;
     gap: 10px;
-}
-
-#btnHighlight {
-    margin-right: 40px; /* Increased from 6px */
+    margin-bottom: 16px;
 }
 
 .annotation-list {
@@ -82,26 +77,27 @@ button:hover {
 }
 
 .search-box {
-    color: #f1f1f1;
+    color: #bfbaba;
     background-color: #3a3a3a;
     border: none;
     padding: 8px;
     border-radius: 6px;
-    transition: background-color 0.3s ease, color 0.3s ease;
+    transition: background-color 0.5s ease-in-out, color 0.5s ease-in-out;
 }
 
 .search-box:hover {
-    background-color: #444;
+    background-color: #030303;
     color: #fff;
 }
 
-.annotation-header {
+.annotations-header {
     width: 100%;
     display: flex;
-    justify-content: space-between;
+    align-items: center;
 }
 
-.annotation-header img {
+.annotations-header img {
+    margin-left: 15px;
     width: 20px;
     height: 20px;
     object-fit: cover;
@@ -111,15 +107,16 @@ button:hover {
 #btnSearch {
     padding: 4px 8px;
     border-radius: 6px;
-    background-color: #444;
-    color: #fff;
+    background-color: #3a3a3a;
+    color: #bfbaba;
     border: none;
     margin-top: 10px;
-    transition: background-color 0.3s ease, border 0.3s ease; /* Added transition for border */
+    transition: background-color 0.5s ease-in-out, color 0.5s ease-in-out; 
 }
 
 #btnSearch:hover {
-    background-color: #777;
+    background-color: #030303;
+    color: #fff;
 }
 
 .more-item {
